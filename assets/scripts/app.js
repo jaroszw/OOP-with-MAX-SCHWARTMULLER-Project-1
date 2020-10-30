@@ -1,19 +1,62 @@
 class Product {
-  constructor(title, image, desc, price) {
+  constructor(title, image, price, desc) {
     this.title = title;
     this.imageUrl = image;
-    this.description = desc;
     this.price = price;
+    this.description = desc;
+  }
+}
+
+class ElementAttribute {
+  constructor(attrName, attrValue) {
+    this.name = attrName;
+    this.value = attrValue;
+  }
+}
+
+class Component {
+  constructor(renderHookId) {
+    this.hookId = renderHookId;
+  }
+
+  createRootElement(tag, cssClasses, attributes) {
+    const rootElement = document.createElement(tag);
+    if (cssClasses) {
+      rootElement.className = cssClasses;
+    }
+
+    if (attributes && attributes.lengthj > 0) {
+      for (attr of attributes) {
+        rootElement.setAttribut(attr.name, attr.value);
+      }
+    }
+    document.getElementById(this.hookId).append(rootElement);
+    return rootElement;
   }
 }
 
 class ShoppingCart {
   items = [];
 
+  set cartItems(value) {
+    this.items = value;
+    this.totalOutput.innerHTML = `<h2>Total \$${this.totalAmount.toFixed(
+      2
+    )}</h2>`;
+  }
+
+  get totalAmount() {
+    const sum = this.items.reduce(
+      (prevValue, curItem) => prevValue + curItem.price,
+      0
+    );
+    return sum;
+  }
+
   addProduct(product) {
-    this.items.push(product);
-    this.totalOutput.innerHTML = `<h2>Total \$${1}</h2>`;
-    console.log(product);
+    const updatedItems = [...this.items];
+    updatedItems.push(product);
+    this.cartItems = updatedItems;
   }
 
   render() {
@@ -71,6 +114,18 @@ class ProductList {
       499,
       "Yet another monitor in Full HD"
     ),
+    new Product(
+      "A Monitor",
+      "https://images.samsung.com/is/image/samsung/pl-led-sf350-ls24f350fhuxen-001-front-black-10059415099326?$PD_GALLERY_L_SHOP_JPG$",
+      120,
+      "Full HD Panoramic screen"
+    ),
+    new Product(
+      "A second Monitor",
+      "https://www.mediaexpert.pl/media/cache/gallery/product/1/542/536/783/hhspagcr/images/96/965058/4741.jpg",
+      580,
+      "Yet another monitor in Full HD"
+    ),
   ];
 
   render() {
@@ -86,12 +141,15 @@ class ProductList {
 }
 
 class Shop {
+  constructor() {
+    this.cart = new ShoppingCart();
+    this.prodList = new ProductList();
+  }
+
   render() {
     const renderHook = document.getElementById("app");
 
-    this.cart = new ShoppingCart();
     const cartEl = this.cart.render();
-    this.prodList = new ProductList();
     const prodListEl = this.prodList.render();
 
     renderHook.append(cartEl);
@@ -106,7 +164,6 @@ class App {
     const shop = new Shop();
     shop.render();
     this.cart = shop.cart;
-    console.log(this.cart);
   }
 
   static addProductToCart(product) {
